@@ -1,0 +1,26 @@
+{
+    "compilerOptions": {
+        "outDir": "./",
+        "noImplicitAny": true,
+        "sourceMap": true,
+        "strict": true,
+        "strictNullChecks": true,
+        "module": "CommonJS",
+        "target": "es5",
+        "moduleResolution": "Node",
+        "lib": [
+            "ES5",
+            "DOM",
+            "ES2015.Collection",
+            "ES2015.Promise",
+            "ES2015.Core",
+        ],
+    },
+    "include": [
+        "src/**/*.ts",
+    ],
+    "exclude": [
+        "*.js",
+        "node_modules"
+    ],
+}

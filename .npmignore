@@ -1,0 +1,9 @@
+# Source code
+/src
+
+# Build configurations
+/tsconfig.json
+
+# Development artifacts
+/*.tgz
+/yarn.lock
