@@ -43,6 +43,9 @@ export async function onCreateNode(
 
         if (node.internal.type === 'File') {
             foremarkNode.fileAbsolutePath = node.absolutePath;
+            foremarkNode.fileRelativePath = node.relativePath;
+            foremarkNode.fileRelativePathWithoutExtension =
+                stripExtension(String(node.relativePath));
         }
 
         createNode(foremarkNode);
@@ -56,6 +59,10 @@ export async function onCreateNode(
             }:\n${err.message}`
         );
     }
+}
+
+function stripExtension(x: string): string {
+    return x.match(/^(.*?)(?:(?:\.mf|\.fm)\.xhtml)?$/i)![1];
 }
 
 export async function createSchemaCustomization(
