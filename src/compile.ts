@@ -2,13 +2,16 @@ import {JSDOM} from 'jsdom';
 import * as Foremark from 'foremark';
 import {TagNames} from 'foremark/dist/foremark';
 
+import {prepareForemarkForViewing} from './mfview';
+import {DEFAULT_VIEWER_CONFIG} from './config';
+
 export interface StaticForemark {
     html: string;
     title: string | null;
     lang: string | null;
 }
 
-export function convertForemarkForStaticView(source: string): StaticForemark {
+export async function convertForemarkForStaticView(source: string): Promise<StaticForemark> {
     const dom = new JSDOM(
         source,
         {contentType: 'application/xhtml+xml'},
@@ -49,7 +52,9 @@ export function convertForemarkForStaticView(source: string): StaticForemark {
 
     Foremark.expandMfText(inputNode);
 
-    // TOOD: Apply view transformation
+    // TODO: Probably view transformation should be toggleable
+    // TODO: Viewer config
+    await prepareForemarkForViewing(inputNode, DEFAULT_VIEWER_CONFIG);
 
     const html = inputNode.outerHTML;
 

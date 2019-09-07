@@ -25,7 +25,7 @@ export async function onCreateNode(
     const content: string = await loadNodeContent(node);
 
     try {
-        const converted = convertForemarkForStaticView(content);
+        const converted = await convertForemarkForStaticView(content);
 
         const foremarkNode: Gatsby.Node = {
             id: createNodeId(`${node.id} >> Foremark`),
