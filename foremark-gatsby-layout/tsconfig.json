@@ -1,12 +1,14 @@
 {
     "compilerOptions": {
-        "outDir": "./",
+        "outDir": "./dist",
         "noImplicitAny": true,
         "sourceMap": true,
         "strict": true,
         "strictNullChecks": true,
         "module": "CommonJS",
         "target": "es5",
+        "jsx": "react",
+        "jsxFactory": "React.h", /* Preact */
         "moduleResolution": "Node",
         "lib": [
             "ES5",
@@ -15,9 +17,14 @@
             "ES2015.Promise",
             "ES2015.Core",
         ],
+        "experimentalDecorators": true,
+        "types": ["node"],
+        "skipLibCheck": true,
     },
     "include": [
         "src/**/*.ts",
+        "foremark/app/view/**/*.ts",
+        "foremark/app/view/**/*.tsx",
     ],
     "exclude": [
         "*.js",

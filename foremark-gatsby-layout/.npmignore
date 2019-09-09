@@ -1,5 +1,6 @@
 # Source code
 /src
+/foremark
 
 # Build configurations
 /tsconfig.json
