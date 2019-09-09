@@ -1,0 +1,3 @@
+[submodule "foremark-gatsby-layout/foremark"]
+	path = foremark-gatsby-layout/foremark
+	url = https://github.com/Foremark/Foremark.git
