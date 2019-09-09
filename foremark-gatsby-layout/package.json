@@ -1,0 +1,28 @@
+{
+  "name": "foremark-gatsby-layout",
+  "version": "0.1.0",
+  "main": "index.js",
+  "license": "MIT",
+  "dependencies": {
+    "gatsby-core-utils": "^1.0.7"
+  },
+  "devDependencies": {
+    "@types/highlight.js": "^9.12.3",
+    "gatsby": "^2.15.9",
+    "mocha": "^6.2.0",
+    "typescript": "^3.6.2"
+  },
+  "peerDependencies": {
+    "gatsby": "^2.12.0"
+  },
+  "scripts": {
+    "test": "mocha",
+    "build": "tsc",
+    "watch": "tsc -w",
+    "prepublishOnly": "rm -rf browser dist && npm run build",
+    "clean": "rm -f *.js *.js.map"
+  },
+  "engines": {
+    "node": ">=8.0.0"
+  }
+}
