@@ -1,6 +1,11 @@
 import * as React from 'preact';
 import {App} from '../foremark/app/view/app';
 
+// Monkeypatch - GatsbyJS defaults to React but Foremark expects Preact.
+if (!React.h) {
+    (React as any).h = (React as any).createElement;
+}
+
 export interface AppLayoutProps {
     html: string;
 }
