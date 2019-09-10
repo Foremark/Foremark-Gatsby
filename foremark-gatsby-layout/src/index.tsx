@@ -15,6 +15,7 @@ interface AppLayoutState {}
 export class AppLayout extends React.Component<AppLayoutProps, AppLayoutState> {
     private readonly renderPromise: Promise<void>;
     private renderDone?: () => void;
+    private foremarkDocument: any;
 
     constructor(props: AppLayoutProps) {
         super(props);
@@ -23,17 +24,29 @@ export class AppLayout extends React.Component<AppLayoutProps, AppLayoutState> {
         this.renderPromise = new Promise(resolve => {
             this.renderDone = resolve;
         });
+
+        this.updateForemarkDocument();
     }
 
     componentDidMount(): void {
         this.renderDone!();
     }
 
+    private updateForemarkDocument(): void {
+        // TODO
+        if (typeof document === 'undefined') {
+            this.foremarkDocument = { querySelectorAll() { return []; } };
+        } else {
+            const doc = this.foremarkDocument = document.createElement('div');
+            doc.innerHTML = this.props.html;
+        }
+    }
+
     render() {
-        const foremarkDocument: any = null; // TODO
+
         return <App
             sitemap={null}
             renderPromise={this.renderPromise}
-            foremarkDocument={foremarkDocument} />;
+            foremarkDocument={this.foremarkDocument} />;
     }
 }
