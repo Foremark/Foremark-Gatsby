@@ -24,8 +24,8 @@
   },
   "scripts": {
     "test": "mocha",
-    "build": "tsc",
-    "watch": "tsc -w",
+    "build": "./copyassets.sh && tsc",
+    "watch": "./copyassets.sh && tsc -w",
     "prepublishOnly": "rm -rf browser dist && npm run build",
     "clean": "rm -f *.js *.js.map"
   },
