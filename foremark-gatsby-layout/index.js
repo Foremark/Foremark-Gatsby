@@ -1,1 +1,1 @@
-exports.AppLayout = require('dist/src/index.js').AppLayout;
+exports.AppLayout = require('./dist/src/index.js').AppLayout;
