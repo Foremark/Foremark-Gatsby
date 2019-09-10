@@ -47,6 +47,7 @@ export class AppLayout extends React.Component<AppLayoutProps, AppLayoutState> {
         return <App
             sitemap={null}
             renderPromise={this.renderPromise}
-            foremarkDocument={this.foremarkDocument} />;
+            foremarkDocument={this.foremarkDocument}
+            hideSpinner={true} />;
     }
 }
