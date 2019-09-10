@@ -1,4 +1,7 @@
-# GatsbyJS plugins for Foremark
+# [GatsbyJS] plugins for [Foremark]
+
+[GatsbyJS]: https://www.gatsbyjs.org
+[Foremark]: https://foremark.github.io
 
 ## `foremark-gatsby-layout`
 
