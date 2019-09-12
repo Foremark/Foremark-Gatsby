@@ -14,7 +14,9 @@ exports.onCreateWebpackConfig = ({ stage, actions, plugins }) => {
           'COMMITHASH': JSON.stringify('?'),
           'BRANCH': JSON.stringify('?'),
           'LAZY_LOADING': JSON.stringify(false),
-          'FOREMARK_STRIP_SSR': JSON.stringify(stage === 'build-javascript'),
+          'FOREMARK_STRIP_SSR': JSON.stringify(
+            stage === 'build-javascript' || stage === 'develop'
+           ),
         },
       })
     ],
