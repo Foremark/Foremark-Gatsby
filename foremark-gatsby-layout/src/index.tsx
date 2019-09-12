@@ -48,7 +48,6 @@ export class AppLayout extends React.Component<AppLayoutProps, AppLayoutState> {
     }
 
     private updateForemarkDocument(): void {
-        // TODO
         if (typeof document === 'undefined') {
             if (!dom) {
                 // We're server-side rendering, but server-side rendering is
@@ -67,11 +66,11 @@ export class AppLayout extends React.Component<AppLayoutProps, AppLayoutState> {
     }
 
     render() {
-
         return <App
             sitemap={null}
             renderPromise={this.renderPromise}
             foremarkDocument={this.foremarkDocument}
+            injectDocumentAsHtml={typeof document === 'undefined'}
             hideSpinner={true} />;
     }
 }
