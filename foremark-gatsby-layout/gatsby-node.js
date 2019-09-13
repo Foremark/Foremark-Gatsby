@@ -16,7 +16,7 @@ exports.onCreateWebpackConfig = ({ stage, actions, plugins }) => {
           'LAZY_LOADING': JSON.stringify(false),
           'FOREMARK_STRIP_SSR': JSON.stringify(
             stage === 'build-javascript' || stage === 'develop'
-           ),
+          ),
         },
       })
     ],
