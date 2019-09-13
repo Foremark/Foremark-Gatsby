@@ -24,8 +24,13 @@ plugins: [
 
 ## `foremark-gatsby-transformer`
 
+## `foremark-config-loader`
+
+This package implements a webpack loader for importing Foremark viewer configuration files.
+
 ## TODO
 
 - The ESLint rule `no-unused-expressions` fails for compiled code. Currently, a GatsbyJS project's `.eslintrc.json` should be updated with the following content: `{ "rules": { "no-unused-expressions": "off" } }`
 - Make a starter project
 - Find a better way to convert between Preact and React
+- Load viewer config

@@ -2,6 +2,7 @@
   "private": true,
   "workspaces": [
     "foremark-gatsby-layout",
-    "foremark-gatsby-transformer"
+    "foremark-gatsby-transformer",
+    "foremark-config-loader"
   ]
 }
