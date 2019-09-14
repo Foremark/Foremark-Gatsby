@@ -2,7 +2,7 @@ import * as React from 'preact';
 import {App} from '../foremark/app/view/app';
 import {setWorkingDom} from '../foremark/app/utils/dom';
 import {DEFAULT_VIEWER_CONFIG, mergeObjects} from '../foremark/app/view/config';
-import {processSitemap, Sitemap} from '../foremark/app/view/sitemap';
+import {expandSitemap, SitemapEntry} from '../foremark/app/view/sitemap';
 
 const dom = process.env.FOREMARK_STRIP_SSR ? null : (() => {
     const JSDOM: typeof import('jsdom').JSDOM = require('jsdom').JSDOM;
@@ -25,7 +25,10 @@ if (!React.h) {
 
 /** Configuration for `AppLayout`. */
 export interface AppConfig {
-    sitemap: Sitemap | null;
+    sitemap: {
+        rootEntries: ReadonlyArray<SitemapEntry>;
+        documentRoot: string;
+    } | null;
 }
 
 /**
@@ -33,6 +36,9 @@ export interface AppConfig {
  *
  * `config` can be either a complete configuration object (`ViewerConfig`) or
  * an array of unmerged configuration objects.
+ *
+ * If a sitemap (`ViewerConfig.sitemap`) is specified, the root path
+ * (`sitemapDocumentRoot`) must be specified explicitly.
  */
 export function loadAppConfigFromViewerConfig(configObjects: object | object[]): AppConfig {
     // Merge config objects
@@ -46,10 +52,28 @@ export function loadAppConfigFromViewerConfig(configObjects: object | object[]):
         config = configObjects as any;
     }
 
-    const [sitemap, sitemapErrors] = processSitemap(config.sitemap, config.sitemapDocumentRoot);
+    const sitemapErrors: string[] = [];
+    const rootEntries = config.sitemap &&
+        expandSitemap(config.sitemap, sitemapErrors, dom ? dom.window.document : document);
 
     if (sitemapErrors.length > 0) {
         throw new Error("Failed to process sitemap: " + sitemapErrors.join('\n'));
+    }
+
+    let sitemap;
+    if (rootEntries) {
+        if (config.sitemapDocumentRoot == null) {
+            throw new Error("sitemapDocumentRoot must be specified when sitemap is set");
+        }
+
+        let documentRoot = config.sitemapDocumentRoot;
+        if (documentRoot.endsWith('/')) {
+            documentRoot = documentRoot.substr(0, documentRoot.length - 1);
+        }
+
+        sitemap = {rootEntries, documentRoot};
+    } else {
+        sitemap = null;
     }
 
     return {sitemap};
@@ -60,6 +84,13 @@ const DEFAULT_CONFIG = loadAppConfigFromViewerConfig([]);
 export interface AppLayoutProps {
     html: string;
     config?: AppConfig;
+
+    /**
+     * The document path used to find a sitemap entry that matches the current
+     * page. Must be specified if a sitemap is enabled. The page must be
+     * included in the sitemap.
+     */
+    path?: string;
 }
 
 interface AppLayoutState {}
@@ -68,6 +99,7 @@ export class AppLayout extends React.Component<AppLayoutProps, AppLayoutState> {
     private readonly renderPromise: Promise<void>;
     private renderDone?: () => void;
     private foremarkDocument: any;
+    private currentSitemapEntry: SitemapEntry | null = null;
 
     constructor(props: AppLayoutProps) {
         super(props);
@@ -78,6 +110,7 @@ export class AppLayout extends React.Component<AppLayoutProps, AppLayoutState> {
         });
 
         this.updateForemarkDocument();
+        this.updateCurrentSitemapEntry();
     }
 
     componentDidMount(): void {
@@ -102,14 +135,73 @@ export class AppLayout extends React.Component<AppLayoutProps, AppLayoutState> {
         }
     }
 
+    componentDidUpdate(prevProps: AppLayoutProps, prevState: AppLayoutState): void {
+        if (prevProps.config !== this.props.config || prevProps.path !== this.props.path) {
+            this.updateCurrentSitemapEntry();
+        }
+    }
+
+    private get config(): AppConfig {
+        return this.props.config || DEFAULT_CONFIG;
+    }
+
+    private updateCurrentSitemapEntry(): void {
+        const {config} = this;
+
+        if (config.sitemap) {
+            if (this.props.path == null) {
+                throw new Error("path is required when a sitemap is set.");
+            }
+
+            const {sitemap} = config;
+            const docPath = this.props.path.toLowerCase();
+
+            let currentEntry: SitemapEntry | null = null;
+
+            forEachEntry(sitemap.rootEntries, e => {
+                for (const path of e.paths) {
+                    if (docPath === sitemap.documentRoot + path.toLowerCase()) {
+                        currentEntry = e;
+                    }
+                }
+            });
+
+            if (!currentEntry) {
+                throw new Error(`path '${this.props.path}' is not in the sitemap`);
+            }
+
+            this.currentSitemapEntry = currentEntry;
+        } else {
+            this.currentSitemapEntry = null;
+        }
+    }
+
     render() {
-        const config = this.props.config || DEFAULT_CONFIG;
+        const {config} = this;
+
+        let sitemap;
+        if (config.sitemap) {
+            sitemap = {
+                rootEntries: config.sitemap.rootEntries,
+                currentEntry: this.currentSitemapEntry!,
+                documentRoot: config.sitemap.documentRoot,
+            };
+        } else {
+            sitemap = null;
+        }
 
         return <App
-            sitemap={config.sitemap}
+            sitemap={sitemap}
             renderPromise={this.renderPromise}
             foremarkDocument={this.foremarkDocument}
             injectDocumentAsHtml={typeof document === 'undefined'}
             hideSpinner={true} />;
+    }
+}
+
+function forEachEntry(list: ReadonlyArray<SitemapEntry>, cb: (e: SitemapEntry) => void): void {
+    for (const e of list) {
+        cb(e);
+        forEachEntry(e.children, cb);
     }
 }
