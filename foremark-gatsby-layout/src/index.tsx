@@ -96,6 +96,10 @@ export function appConfigRemapSitemapPaths(config: AppConfig, fn: (paths: string
 
 const DEFAULT_CONFIG = loadAppConfigFromViewerConfig([]);
 
+// Import stylesheets. Of all page content stylesheets, only `katex.less` seems
+// to be not indirectly referenced by modules we use.
+require('../foremark/lib/katex.less');
+
 export interface AppLayoutProps {
     html: string;
     config?: AppConfig;
