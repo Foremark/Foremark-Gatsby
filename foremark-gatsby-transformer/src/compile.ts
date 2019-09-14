@@ -80,7 +80,7 @@ export async function convertForemarkForStaticView(source: string, ctx: MediaHan
         } else if (node.tagName === ViewTagNames.Sidenote && inPara) {
             // This element has to be moved
             node.parentElement!.removeChild(node);
-            relocatedElems.push(node);
+            relocatedElems.unshift(node);
             return;
         }
 
