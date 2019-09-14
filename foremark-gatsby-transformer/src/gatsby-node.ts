@@ -22,12 +22,14 @@ export async function onCreateNode(
         return;
     }
 
+    const content: string = await loadNodeContent(node);
+
     const foremarkNode: Gatsby.Node = {
         id: createNodeId(`${node.id} >> Foremark`),
         children: [],
         parent: node.id,
         internal: {
-            content: node.internal.content,
+            content: content,
             contentDigest: node.internal.contentDigest,
             owner: void 0 as any,
             type: 'Foremark',
