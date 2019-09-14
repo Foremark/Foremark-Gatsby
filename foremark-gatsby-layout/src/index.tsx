@@ -1,4 +1,6 @@
 import * as React from 'preact';
+import {navigate} from 'gatsby';
+
 import {App} from '../foremark/app/view/app';
 import {setWorkingDom} from '../foremark/app/utils/dom';
 import {DEFAULT_VIEWER_CONFIG, mergeObjects} from '../foremark/app/view/config';
@@ -214,6 +216,7 @@ export class AppLayout extends React.Component<AppLayoutProps, AppLayoutState> {
             renderPromise={this.renderPromise}
             foremarkDocument={this.foremarkDocument}
             injectDocumentAsHtml={typeof document === 'undefined'}
+            assignLocation={navigate}
             hideSpinner={true} />;
     }
 }
