@@ -12,7 +12,7 @@ import {ViewerConfig} from './config';
 import {toSvg} from './diagram';
 
 /** Tags introduced by `prepareForemarkForViewing`. */
-const enum ViewTagNames {
+export const enum ViewTagNames {
     FloatingElementLabel = 'mf-label',
     Sidenote = 'mf-sidenote',
     DiagramInner = 'mf-diagram-inner',

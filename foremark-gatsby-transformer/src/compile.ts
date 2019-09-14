@@ -2,7 +2,7 @@ import {JSDOM} from 'jsdom';
 import * as Foremark from 'foremark';
 import {TagNames} from 'foremark/dist/foremark';
 
-import {prepareForemarkForViewing} from './mfview';
+import {prepareForemarkForViewing, ViewTagNames} from './mfview';
 import {DEFAULT_VIEWER_CONFIG} from './config';
 
 export interface StaticForemark {
@@ -56,6 +56,49 @@ export async function convertForemarkForStaticView(source: string): Promise<Stat
     // TODO: Viewer config
     await prepareForemarkForViewing(inputNode, DEFAULT_VIEWER_CONFIG);
 
+    // Legalize HTML by moving `mf-sidenote` to valid locations, i.e., outside
+    // a paragraph.
+    //
+    // `mf-sidenote` elements often include block elements which HTML disallows
+    // to be in `<p>`.
+    //
+    // Unfortunately, this changes the page's apperance. A more reliable
+    // alternative is to replace with `<p>` with a custom element like
+    // `<mf-para>`, but that would require changes to the stylesheet.
+    let inPara = false;
+    const relocatedElems: Element[] = [];
+    function moveSidenotes(node: Node) {
+        if (!isElement(node)) {
+            return;
+        }
+
+        const isPara = node.tagName === 'p';
+
+        if (isPara) {
+            inPara = true;
+        } else if (node.tagName === ViewTagNames.Sidenote && inPara) {
+            // This element has to be moved
+            node.parentElement!.removeChild(node);
+            relocatedElems.push(node);
+            return;
+        }
+
+        for (let n: Node | null = node.firstChild; n; ) {
+            const next = n.nextSibling;
+            moveSidenotes(n);
+            n = next;
+        }
+
+        if (isPara) {
+            // Move elements in `relocatedElems` here
+            for (const e of relocatedElems) {
+                node.parentElement!.insertBefore(e, node.nextSibling);
+            }
+            relocatedElems.length = 0;
+        }
+    }
+    moveSidenotes(inputNode);
+
     const html = inputNode.outerHTML;
 
     // Get the page title
@@ -66,11 +109,13 @@ export async function convertForemarkForStaticView(source: string): Promise<Stat
     const htmlEl = document.getElementsByTagName('html')[0];
     const lang = (htmlEl && htmlEl.lang) || null;
 
-    // TODO: Probably should be converted from XHTML to HTML.
-    //       (Note that Foremark does not support HTML)
     return {
         html,
         title,
         lang,
     };
+}
+
+function isElement(x: Node | null | undefined): x is Element {
+    return x != null && x.nodeType === 1;
 }
