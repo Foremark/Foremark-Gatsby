@@ -1,1 +1,1 @@
-exports.AppLayout = require('./dist/src/index.js').AppLayout;
+export {AppLayout, loadAppConfigFromViewerConfig} from './dist/src/index.js';
