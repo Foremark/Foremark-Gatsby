@@ -46,8 +46,6 @@ export async function convertForemarkForStaticView(source: string): Promise<Stat
         const mf = document.createElement(TagNames.Document);
         mf.appendChild(inputNode);
         inputNode = mf;
-    } else {
-        inputNode.parentElement!.removeChild(inputNode);
     }
 
     Foremark.expandMfText(inputNode);
