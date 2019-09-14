@@ -1,7 +1,7 @@
 export interface ViewerConfig {
     // TODO: `mediaHandlers`
 
-    // No `sitemap` here - Gatsby should do that
+    // No `sitemap` here - It's up to `foremark-gatsby-layout`
 
     /**
      * Enables or disables automatic heading numbering.
