@@ -1,6 +1,6 @@
 // Gatsby plugin API
 import * as Gatsby from 'gatsby';
-import {convertForemarkForStaticView} from './compile';
+import {convertForemarkForStaticView, StaticForemark} from './compile';
 
 export async function onCreateNode(
     {
@@ -22,43 +22,30 @@ export async function onCreateNode(
         return;
     }
 
-    const content: string = await loadNodeContent(node);
+    const foremarkNode: Gatsby.Node = {
+        id: createNodeId(`${node.id} >> Foremark`),
+        children: [],
+        parent: node.id,
+        internal: {
+            content: node.internal.content,
+            contentDigest: node.internal.contentDigest,
+            owner: void 0 as any,
+            type: 'Foremark',
+        },
+        fileAbsolutePath: void 0,
+    };
 
-    try {
-        const converted = await convertForemarkForStaticView(content);
-
-        const foremarkNode: Gatsby.Node = {
-            id: createNodeId(`${node.id} >> Foremark`),
-            children: [],
-            parent: node.id,
-            internal: {
-                content: converted.html,
-                contentDigest: createContentDigest(converted.html),
-                owner: void 0 as any,
-                type: 'Foremark',
-            },
-            fileAbsolutePath: void 0,
-            title: converted.title,
-        };
-
-        if (node.internal.type === 'File') {
-            foremarkNode.fileAbsolutePath = node.absolutePath;
-            foremarkNode.fileRelativePath = node.relativePath;
-            foremarkNode.fileRelativePathWithoutExtension =
-                stripExtension(String(node.relativePath));
-        }
-
-        createNode(foremarkNode);
-        createParentChildLink({parent: node, child: foremarkNode});
-
-        return foremarkNode;
-    } catch (err) {
-        reporter.panicOnBuild(
-            `Error processing Foremark ${
-                node.absolutePath ? `file ${node.absolutePath}` : `in node ${node.id}`
-            }:\n${err.message}`
-        );
+    if (node.internal.type === 'File') {
+        foremarkNode.fileAbsolutePath = node.absolutePath;
+        foremarkNode.fileRelativePath = node.relativePath;
+        foremarkNode.fileRelativePathWithoutExtension =
+            stripExtension(String(node.relativePath));
     }
+
+    createNode(foremarkNode);
+    createParentChildLink({parent: node, child: foremarkNode});
+
+    return foremarkNode;
 }
 
 function stripExtension(x: string): string {
@@ -75,4 +62,54 @@ export async function createSchemaCustomization(
             id: ID!
         }
     `);
+}
+
+
+export async function setFieldsOnGraphQLNodeType(
+    {type, cache, basePath}: Gatsby.SetFieldsOnGraphQLNodeTypeArgs,
+    options: Gatsby.PluginOptions,
+): Promise<object> {
+    if (type.name !== 'Foremark') {
+        return {};
+    }
+
+    const mkCacheKey = (node: Gatsby.Node, type: string) =>
+      `transformer-foremark-${type}-${node.internal.contentDigest}-${basePath}`
+
+    const convertedCacheKey = (node: Gatsby.Node) => mkCacheKey(node, 'html');
+
+    async function getConverted(foremarkNode: Gatsby.Node): Promise<StaticForemark> {
+        const convertedContent = await cache.get(convertedCacheKey(foremarkNode));
+        if (convertedContent) {
+            return convertedContent;
+        } else {
+            const content = foremarkNode.internal.content!;
+            if (content == null) {
+                throw new Error("content is null");
+            }
+
+            const converted = await convertForemarkForStaticView(content);
+            cache.set(convertedCacheKey(foremarkNode), converted);
+            return converted;
+        }
+    }
+
+    async function getHtml(foremarkNode: Gatsby.Node): Promise<string> {
+        return (await getConverted(foremarkNode)).html;
+    }
+
+    async function getTitle(foremarkNode: Gatsby.Node): Promise<string> {
+        return (await getConverted(foremarkNode)).title || '';
+    }
+
+    return {
+        html: {
+            type: 'String',
+            resolve: getHtml,
+        },
+        title: {
+            type: 'String',
+            resolve: getTitle,
+        },
+    };
 }
