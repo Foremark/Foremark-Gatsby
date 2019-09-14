@@ -1,1 +1,5 @@
-export {AppLayout, loadAppConfigFromViewerConfig} from './dist/src/index.js';
+export {
+    AppLayout,
+    loadAppConfigFromViewerConfig,
+    appConfigRemapSitemapPaths,
+} from './dist/src/index.js';

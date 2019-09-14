@@ -23,7 +23,11 @@ if (!React.h) {
     (React as any).h = (React as any).createElement;
 }
 
-/** Configuration for `AppLayout`. */
+/**
+ * Configuration for `AppLayout`.
+ *
+ * Note: The fields are not public and subject to change in the future.
+ */
 export interface AppConfig {
     sitemap: {
         rootEntries: ReadonlyArray<SitemapEntry>;
@@ -77,6 +81,17 @@ export function loadAppConfigFromViewerConfig(configObjects: object | object[]):
     }
 
     return {sitemap};
+}
+
+/**
+ * Replace paths of sitemap entries using the specified function.
+ */
+export function appConfigRemapSitemapPaths(config: AppConfig, fn: (paths: string[]) => string[]): void {
+    if (config.sitemap) {
+        forEachEntry(config.sitemap.rootEntries, e => {
+            e.paths = fn(e.paths);
+        });
+    }
 }
 
 const DEFAULT_CONFIG = loadAppConfigFromViewerConfig([]);
