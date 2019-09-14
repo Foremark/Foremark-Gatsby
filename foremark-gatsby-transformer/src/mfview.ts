@@ -9,6 +9,7 @@ import * as Hljs from 'highlight.js';
 import {forEachNodePreorder, transformTextNodeWith} from 'foremark/dist/utils/dom';
 import {TagNames, AttributeNames, FIGURE_STANDARD_ID_RE} from 'foremark/dist/foremark';
 import {ViewerConfig} from './config';
+import {toSvg} from './diagram';
 
 /** Tags introduced by `prepareForemarkForViewing`. */
 const enum ViewTagNames {
@@ -701,9 +702,7 @@ const HANDLERS: { [tagName: string]: (node: Element, vc: ViewerConfig) => void |
     },
     [TagNames.Diagram]: async (node) => {
         // const diagram = await lazyModules.diagram();
-        const diagram = void 0 as any;
-        return; // TODO
-        const svgCode = diagram.to_svg(node.textContent!);
+        const svgCode = await toSvg(node.textContent!);
         node.innerHTML = svgCode;
 
         // Make the SVG image responsive

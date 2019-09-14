@@ -14,6 +14,8 @@
     "@types/highlight.js": "^9.12.3",
     "@types/jsdom": "^12.2.4",
     "@types/katex": "^0.10.1",
+    "@types/node": "^12.7.5",
+    "@types/webassembly-web-api": "^0.0.2",
     "gatsby": "^2.15.9",
     "mocha": "^6.2.0",
     "typescript": "^3.6.2"
@@ -29,6 +31,6 @@
     "clean": "rm -f *.js *.js.map"
   },
   "engines": {
-    "node": ">=8.0.0"
+    "node": ">=10.0.0"
   }
 }
