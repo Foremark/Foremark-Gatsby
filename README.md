@@ -36,3 +36,4 @@ This package implements a webpack loader for importing Foremark viewer configura
 - Per-page viewer config
 - Media handlers
 - Reduce the usage of Foremark's private API such as `expandSitemap` and `mergeObjects`
+- Fix for HTML, e.g., move elements to a valid place
