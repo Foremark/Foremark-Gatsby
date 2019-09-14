@@ -35,3 +35,4 @@ This package implements a webpack loader for importing Foremark viewer configura
 - Find a better way to convert between Preact and React
 - Per-page viewer config
 - Media handlers
+- Reduce the usage of Foremark's private API such as `expandSitemap` and `mergeObjects`
