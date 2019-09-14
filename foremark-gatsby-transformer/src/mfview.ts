@@ -10,6 +10,7 @@ import {forEachNodePreorder, transformTextNodeWith} from 'foremark/dist/utils/do
 import {TagNames, AttributeNames, FIGURE_STANDARD_ID_RE} from 'foremark/dist/foremark';
 import {ViewerConfig} from './config';
 import {toSvg} from './diagram';
+import {processMediaElement, MediaHandlerContext} from './media';
 
 /** Tags introduced by `prepareForemarkForViewing`. */
 export const enum ViewTagNames {
@@ -38,10 +39,12 @@ function isText(x: Node | null | undefined): x is Text {
     return x != null && x.nodeType === 3;
 }
 
+export type Context = MediaHandlerContext;
+
 /**
  * Transforms Foremark XML for viewing.
  */
-export function prepareForemarkForViewing(node: Element, config: ViewerConfig): Promise<void> {
+export function prepareForemarkForViewing(node: Element, config: ViewerConfig, ctx: Context): Promise<void> {
     const document = node.ownerDocument!;
 
     // Modify headings
@@ -565,7 +568,7 @@ export function prepareForemarkForViewing(node: Element, config: ViewerConfig): 
         if (isElement(node)) {
             const tagName = node.tagName.toLowerCase();
             if (HANDLERS.hasOwnProperty(tagName)) {
-                const promise = HANDLERS[tagName](node, config);
+                const promise = HANDLERS[tagName](node, config, ctx);
                 if (promise) {
                     promises.push(promise);
                 }
@@ -657,7 +660,7 @@ function xhtmlifyKatexOutput(html: string): string {
     return html.replace(KATEX_ENTITY_REGEX, (_, name) => KATEX_ENTITY_TABLE_MAP.get(name)!);
 }
 
-const HANDLERS: { [tagName: string]: (node: Element, vc: ViewerConfig) => void | PromiseLike<void> } & Object = {
+const HANDLERS: { [tagName: string]: (node: Element, vc: ViewerConfig, ctx: Context) => void | PromiseLike<void> } & Object = {
     [TagNames.Equation]: async (node) => {
         node.innerHTML = xhtmlifyKatexOutput(
             Katex.renderToString(node.textContent || '', katexInlineOptions));
@@ -722,5 +725,5 @@ const HANDLERS: { [tagName: string]: (node: Element, vc: ViewerConfig) => void |
 
         inner.style.maxWidth = `${width}px`;
     },
-    // TODO: [TagNames.Media]: (node, config) => processMediaElement(node, config),
+    [TagNames.Media]: (node, config, ctx) => processMediaElement(node, config, ctx),
 };

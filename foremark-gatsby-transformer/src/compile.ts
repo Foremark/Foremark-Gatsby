@@ -4,6 +4,7 @@ import {TagNames} from 'foremark/dist/foremark';
 
 import {prepareForemarkForViewing, ViewTagNames} from './mfview';
 import {DEFAULT_VIEWER_CONFIG} from './config';
+import {MediaHandlerContext} from './media';
 
 export interface StaticForemark {
     html: string;
@@ -11,7 +12,9 @@ export interface StaticForemark {
     lang: string | null;
 }
 
-export async function convertForemarkForStaticView(source: string): Promise<StaticForemark> {
+export {Context} from './mfview';
+
+export async function convertForemarkForStaticView(source: string, ctx: MediaHandlerContext): Promise<StaticForemark> {
     const dom = new JSDOM(
         source,
         {contentType: 'application/xhtml+xml'},
@@ -52,7 +55,7 @@ export async function convertForemarkForStaticView(source: string): Promise<Stat
 
     // TODO: Probably view transformation should be toggleable
     // TODO: Viewer config
-    await prepareForemarkForViewing(inputNode, DEFAULT_VIEWER_CONFIG);
+    await prepareForemarkForViewing(inputNode, DEFAULT_VIEWER_CONFIG, ctx);
 
     // Legalize HTML by moving `mf-sidenote` to valid locations, i.e., outside
     // a paragraph.

@@ -8,7 +8,8 @@
     "gatsby-core-utils": "^1.0.7",
     "highlight.js": "^9.15.10",
     "jsdom": "^15.1.1",
-    "katex": "^0.11.0"
+    "katex": "^0.11.0",
+    "query-string": "^6.8.3"
   },
   "devDependencies": {
     "@types/highlight.js": "^9.12.3",
@@ -17,11 +18,13 @@
     "@types/node": "^12.7.5",
     "@types/webassembly-web-api": "^0.0.2",
     "gatsby": "^2.15.9",
+    "gatsby-plugin-sharp": "^2.0.0-beta.5",
     "mocha": "^6.2.0",
     "typescript": "^3.6.2"
   },
   "peerDependencies": {
-    "gatsby": "^2.12.0"
+    "gatsby": "^2.12.0",
+    "gatsby-plugin-sharp": "^2.0.0-beta.5"
   },
   "scripts": {
     "test": "mocha",

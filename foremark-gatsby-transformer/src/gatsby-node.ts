@@ -1,6 +1,6 @@
 // Gatsby plugin API
 import * as Gatsby from 'gatsby';
-import {convertForemarkForStaticView, StaticForemark} from './compile';
+import {convertForemarkForStaticView, StaticForemark, Context} from './compile';
 
 export async function onCreateNode(
     {
@@ -68,7 +68,14 @@ export async function createSchemaCustomization(
 
 
 export async function setFieldsOnGraphQLNodeType(
-    {type, cache, basePath}: Gatsby.SetFieldsOnGraphQLNodeTypeArgs,
+    {
+        type,
+        cache,
+        basePath,
+        getNodesByType,
+        getNode,
+        reporter,
+    }: Gatsby.SetFieldsOnGraphQLNodeTypeArgs,
     options: Gatsby.PluginOptions,
 ): Promise<object> {
     if (type.name !== 'Foremark') {
@@ -80,6 +87,15 @@ export async function setFieldsOnGraphQLNodeType(
 
     const convertedCacheKey = (node: Gatsby.Node) => mkCacheKey(node, 'html');
 
+    let fileNodes: Gatsby.Node[] | null = null;
+
+    function getFileNodes() {
+        if (process.env.NODE_ENV !== `production` || !fileNodes) {
+            fileNodes = getNodesByType(`File`)
+        }
+        return fileNodes!;
+    }
+
     async function getConverted(foremarkNode: Gatsby.Node): Promise<StaticForemark> {
         const convertedContent = await cache.get(convertedCacheKey(foremarkNode));
         if (convertedContent) {
@@ -90,7 +106,14 @@ export async function setFieldsOnGraphQLNodeType(
                 throw new Error("content is null");
             }
 
-            const converted = await convertForemarkForStaticView(content);
+            const ctx: Context = {
+                files: getFileNodes(),
+                foremarkFileNode: getNode(foremarkNode.parent),
+                cache,
+                reporter,
+            };
+
+            const converted = await convertForemarkForStaticView(content, ctx);
             cache.set(convertedCacheKey(foremarkNode), converted);
             return converted;
         }
