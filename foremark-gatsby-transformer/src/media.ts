@@ -188,7 +188,9 @@ async function handleLocalImage(img: Element, ctx: MediaHandlerContext, linkedNo
     // TODO: Choose image sizes smartly
     const fluidResult = await fluid({
         file: linkedNode,
-        args: {},
+        args: {
+            pathPrefix: ctx.pathPrefix,
+        },
         reporter: ctx.reporter,
         cache: ctx.cache,
     });
