@@ -7,6 +7,7 @@ import {Pattern, patternMatches} from 'foremark/dist/utils/pattern';
 import {escapeXmlText} from 'foremark/dist/utils/dom';
 import {TagNames} from 'foremark/dist/foremark';
 import {ViewerConfig} from './config';
+import {getPublicPath} from './copy-file';
 
 /**
  * Describes a media handler.
@@ -45,25 +46,31 @@ export interface MediaHandlerContext {
     readonly files: Gatsby.Node[];
     readonly reporter: Gatsby.Reporter;
     readonly cache: unknown;
+    readonly pathPrefix: string;
 }
 
 /**
  * Defines built-in media handlers.
  */
 export const BUILTIN_MEDIA_HANDLERS = {
+    'image-sharp': {
+        patterns: [/\.(png|jpg|jpe|jpeg|jp2|jpf)$/i],
+        handler: (e: Element, ctx: MediaHandlerContext) => handleImageBySharp(e, ctx),
+        priority: 10,
+    },
     'image': {
         patterns: null,
-        handler: (e: Element, ctx: MediaHandlerContext) => handleHtml5Media(e, ctx, 'img'),
+        handler: (e: Element, ctx: MediaHandlerContext) => handleHtml5MediaByCopy(e, ctx, 'img'),
         priority: 0,
     },
     'video': {
         patterns: [/\.(mp4|m4v|ogm|ogv|avi|pg|mov|wmv|webm)$/i],
-        handler: (e: Element, ctx: MediaHandlerContext) => handleHtml5Media(e, ctx, 'video'),
+        handler: (e: Element, ctx: MediaHandlerContext) => handleHtml5MediaByCopy(e, ctx, 'video'),
         priority: 20,
     },
     'audio': {
         patterns: [/\.(mp3|ogg|oga|spx|wav|au|opus|m4a|wma)$/i],
-        handler: (e: Element, ctx: MediaHandlerContext) => handleHtml5Media(e, ctx, 'audio'),
+        handler: (e: Element, ctx: MediaHandlerContext) => handleHtml5MediaByCopy(e, ctx, 'audio'),
         priority: 10,
     },
 };
@@ -113,41 +120,46 @@ export async function processMediaElement(e: Element, config: ViewerConfig, ctx:
     }
 }
 
-async function handleHtml5Media(e: Element, ctx: MediaHandlerContext, type: 'video' | 'audio' | 'img') {
-    const img = e.ownerDocument!.createElement(type);
+function changeTagNameAndReplaceElement(e: Element, newTagName: string): Element {
+    const newElement = e.ownerDocument!.createElement(newTagName);
 
-    if (type !== 'img') {
-        img.setAttribute('controls', 'controls');
-    }
-
-    let attrs = e.attributes;
+    const attrs = e.attributes;
     for (let i = 0, c = attrs.length; i < c; ++i) {
-        img.setAttribute(attrs[i].name, attrs[i].value);
+        newElement.setAttribute(attrs[i].name, attrs[i].value);
     }
 
-    if (img.hasAttribute('src')) {
-        const src = img.getAttribute('src')!;
+    e.parentElement!.insertBefore(newElement, e);
+    e.parentElement!.removeChild(e);
 
-        const linkedNode = resolveLocalNode(src, ctx);
+    return newElement;
+}
 
-        if (linkedNode) {
-            if (type === 'img') {
-                await handleLocalImage(img, ctx, linkedNode);
-            } else {
-                // TODO: Copy the linked file to the public path
-                //       like `gatsby-remark-copy-linked-files`
-                // TODO: Use the original file for SVG images. Reasons:
-                //       1. `gatsby-plugin-sharp` rasterizes SVG images, increasing the processing
-                //           cost on both ends.
-                //       2. The rasterized PNG images don't display in some browsers, probably
-                //          because they have the wrong `.svg` file extension.
-                //       3. The image resolution is insufficient for printing.
-            }
+async function handleHtml5MediaByCopy(e: Element, ctx: MediaHandlerContext, type: 'video' | 'audio' | 'img') {
+    if (type !== 'img') {
+        e.setAttribute('controls', 'controls');
+    }
+
+    const src = e.getAttribute('src')!;
+    const linkedNode = resolveLocalNode(src, ctx);
+    if (linkedNode) {
+        const newSrc = await getPublicPath(linkedNode, {}, ctx.pathPrefix);
+
+        if (newSrc != null) {
+            e.setAttribute('src', newSrc);
         }
     }
 
-    e.parentElement!.insertBefore(img, e);
-    e.parentElement!.removeChild(e);
+    changeTagNameAndReplaceElement(e, 'img');
+}
+
+async function handleImageBySharp(e: Element, ctx: MediaHandlerContext) {
+    const src = e.getAttribute('src')!;
+    const linkedNode = resolveLocalNode(src, ctx);
+    if (linkedNode) {
+        await handleLocalImage(e, ctx, linkedNode);
+    }
+
+    changeTagNameAndReplaceElement(e, 'img');
 }
 
 function resolveLocalNode(src: string, ctx: MediaHandlerContext): Gatsby.Node | undefined {

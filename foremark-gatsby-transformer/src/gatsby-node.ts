@@ -75,6 +75,7 @@ export async function setFieldsOnGraphQLNodeType(
         getNodesByType,
         getNode,
         reporter,
+        pathPrefix,
     }: Gatsby.SetFieldsOnGraphQLNodeTypeArgs,
     options: Gatsby.PluginOptions,
 ): Promise<object> {
@@ -111,6 +112,7 @@ export async function setFieldsOnGraphQLNodeType(
                 foremarkFileNode: getNode(foremarkNode.parent),
                 cache,
                 reporter,
+                pathPrefix,
             };
 
             const errors: string[] = [];
