@@ -14,7 +14,11 @@ export interface StaticForemark {
 
 export {Context} from './mfview';
 
-export async function convertForemarkForStaticView(source: string, ctx: MediaHandlerContext): Promise<StaticForemark> {
+export async function convertForemarkForStaticView(
+    source: string,
+    ctx: MediaHandlerContext,
+    onError: (message: string) => void,
+): Promise<StaticForemark> {
     const dom = new JSDOM(
         source,
         {contentType: 'application/xhtml+xml'},
@@ -99,6 +103,11 @@ export async function convertForemarkForStaticView(source: string, ctx: MediaHan
         }
     }
     moveSidenotes(inputNode);
+
+    // Detect errors
+    for (const elem of Array.prototype.slice.call(inputNode.getElementsByTagName(TagNames.Error), 0)) {
+        onError(elem.innerHTML);
+    }
 
     const html = inputNode.outerHTML;
 

@@ -113,7 +113,24 @@ export async function setFieldsOnGraphQLNodeType(
                 reporter,
             };
 
-            const converted = await convertForemarkForStaticView(content, ctx);
+            const errors: string[] = [];
+            const converted = await convertForemarkForStaticView(
+                content,
+                ctx,
+                (error: string) => errors.push(error),
+            );
+
+            if (errors.length > 0) {
+                const nodeName = ctx.foremarkFileNode.name ||  ctx.foremarkFileNode.id;
+                reporter.warn(
+                    `Foremark produced one or more errors while processing ` +
+                    `the node "${nodeName}":`
+                );
+                for (const e of errors) {
+                    reporter.warn(` - ${e}`);
+                }
+            }
+
             cache.set(convertedCacheKey(foremarkNode), converted);
             return converted;
         }
