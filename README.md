@@ -22,6 +22,10 @@ plugins: [
 ]
 ```
 
+### Tips
+
+- **TOC navigation without JavaScript**: This component is mostly usable even without client-side JavaScript enabled. However, in this case, sitemap (global TOC) entries cannot be expanded by clicking the expand button. Usually, visitors can just click the TOC entry's link, which automatically reveals its children. However, if the entry does not have any pages attached, this won't work because the link is unclickable, thus making it impossible to navigate child pages. Therefore, it's recommended to attach a page to every sitemap entry.
+
 ## `foremark-gatsby-transformer`
 
 TODO
