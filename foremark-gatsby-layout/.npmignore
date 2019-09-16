@@ -3,6 +3,9 @@
 /foremark
 /copyassets.sh
 
+# Foremark's version info
+!/foremark/package.json
+
 # Build configurations
 /tsconfig.json
 
