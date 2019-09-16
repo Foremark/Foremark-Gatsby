@@ -2,11 +2,13 @@
 
 cd "`dirname "$0"`"
 
-for x in `find . -iname '*.less'` \
-    `find . -iname '*.css'` \
-    `find . -iname '*.svg'` \
-    `find . -iname '*.woff'` \
-    `find . -iname '*.woff2'`
+SEARCHDIR=foremark
+
+for x in `find $SEARCHDIR -iname '*.less'` \
+    `find $SEARCHDIR -iname '*.css'` \
+    `find $SEARCHDIR -iname '*.svg'` \
+    `find $SEARCHDIR -iname '*.woff'` \
+    `find $SEARCHDIR -iname '*.woff2'`
 do
     mkdir -p "`dirname "dist/$x"`"
     cp "$x" "dist/$x"

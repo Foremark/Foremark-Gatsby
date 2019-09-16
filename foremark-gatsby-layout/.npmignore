@@ -1,6 +1,7 @@
 # Source code
 /src
 /foremark
+/copyassets.sh
 
 # Build configurations
 /tsconfig.json
