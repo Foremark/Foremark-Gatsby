@@ -5054,10 +5054,10 @@ for-in@^1.0.2:
   resolved "https://registry.yarnpkg.com/for-in/-/for-in-1.0.2.tgz#81068d295a8142ec0ac726c6e2200c30fb6d5e80"
   integrity sha1-gQaNKVqBQuwKxybG4iAMMPttXoA=
 
-foremark@^0.3.0:
-  version "0.3.0"
-  resolved "https://registry.yarnpkg.com/foremark/-/foremark-0.3.0.tgz#89a95f95a8411850bd22e9991799315421daa8fc"
-  integrity sha512-f5vQyPffnmlUES54HpXHCM56guGvOacVcn0tcDgrbiPCtPL+xVbMFkyC1+O6aLrSdzSG3LmoBNJ01IQLbw8YMw==
+foremark@^0.4.0:
+  version "0.4.0"
+  resolved "https://registry.yarnpkg.com/foremark/-/foremark-0.4.0.tgz#402b781104868bb9b447ecd94a99eaec0a99f301"
+  integrity sha512-BShWMDmGMupo6Ekca6hZf9klCankjcjB0p/iEO/60EGLXZnbTnlvKXedzSutlqc8U6Gvari9UkW6Ic1SEi09AA==
 
 forever-agent@~0.6.1:
   version "0.6.1"
