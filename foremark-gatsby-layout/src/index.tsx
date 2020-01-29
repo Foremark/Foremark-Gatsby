@@ -103,7 +103,7 @@ const DEFAULT_CONFIG = loadAppConfigFromViewerConfig([]);
 require('../foremark/lib/katex.less');
 
 export interface AppLayoutProps {
-    html: string;
+    html?: string;
     config?: AppConfig;
 
     /**
@@ -112,6 +112,14 @@ export interface AppLayoutProps {
      * included in the sitemap.
      */
     path?: string;
+
+    /**
+     * Overrides the displayed document. Warning: TOC will be generated based
+     * on `foremarkDocument` even if `children` is set.
+     *
+     * When specified, it should have `<main>` as the root element.
+     */
+    children?: React.ComponentChildren;
 }
 
 interface AppLayoutState {}
@@ -139,6 +147,12 @@ export class AppLayout extends React.Component<AppLayoutProps, AppLayoutState> {
     }
 
     private updateForemarkDocument(): void {
+        let {html} = this.props;
+
+        if (html == null) {
+            html = '<div></div>';
+        }
+
         if (typeof document === 'undefined') {
             if (!dom) {
                 // We're server-side rendering, but server-side rendering is
@@ -147,12 +161,12 @@ export class AppLayout extends React.Component<AppLayoutProps, AppLayoutState> {
             }
 
             const e = dom.window.document.createElement('div');
-            e.innerHTML = this.props.html;
+            e.innerHTML = html;
 
             this.foremarkDocument = e;
         } else {
             const doc = this.foremarkDocument = document.createElement('div');
-            doc.innerHTML = this.props.html;
+            doc.innerHTML = html;
         }
     }
 
@@ -214,6 +228,7 @@ export class AppLayout extends React.Component<AppLayoutProps, AppLayoutState> {
         return <App
             sitemap={sitemap}
             renderPromise={this.renderPromise}
+            children={this.props.children}
             foremarkDocument={this.foremarkDocument}
             injectDocumentAsHtml={typeof document === 'undefined'}
             assignLocation={navigate}
