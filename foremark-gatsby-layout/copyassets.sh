@@ -13,3 +13,5 @@ do
     mkdir -p "`dirname "dist/$x"`"
     cp "$x" "dist/$x"
 done
+
+rm -rf "dist/foremark/rust"
