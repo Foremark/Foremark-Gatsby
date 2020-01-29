@@ -108,10 +108,9 @@ export interface AppLayoutProps {
 
     /**
      * The document path used to find a sitemap entry that matches the current
-     * page. Must be specified if a sitemap is enabled. The page must be
-     * included in the sitemap.
+     * page. If specified, the page must be included in the sitemap.
      */
-    path?: string;
+    path?: string | null;
 
     /**
      * Overrides the displayed document. Warning: TOC will be generated based
@@ -183,11 +182,7 @@ export class AppLayout extends React.Component<AppLayoutProps, AppLayoutState> {
     private updateCurrentSitemapEntry(): void {
         const {config} = this;
 
-        if (config.sitemap) {
-            if (this.props.path == null) {
-                throw new Error("path is required when a sitemap is set.");
-            }
-
+        if (config.sitemap && this.props.path) {
             const {sitemap} = config;
             const docPath = this.props.path.toLowerCase();
 
@@ -218,7 +213,7 @@ export class AppLayout extends React.Component<AppLayoutProps, AppLayoutState> {
         if (config.sitemap) {
             sitemap = {
                 rootEntries: config.sitemap.rootEntries,
-                currentEntry: this.currentSitemapEntry!,
+                currentEntry: this.currentSitemapEntry,
                 documentRoot: config.sitemap.documentRoot,
             };
         } else {
