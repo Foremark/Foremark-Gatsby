@@ -1,6 +1,7 @@
 // Gatsby plugin API
 import * as Gatsby from 'gatsby';
 import {convertForemarkForStaticView, StaticForemark, Context} from './compile';
+import {createExcerptHtmlForHtml} from './htmlproc';
 
 export async function onCreateNode(
     {
@@ -146,6 +147,17 @@ export async function setFieldsOnGraphQLNodeType(
         return (await getConverted(foremarkNode)).title || '';
     }
 
+    async function getExcerptHtml(
+        foremarkNode: Gatsby.Node,
+        { pruneLength }: {
+            pruneLength: number,
+        },
+    ): Promise<string> {
+        const html = await getHtml(foremarkNode);
+
+        return createExcerptHtmlForHtml(html, pruneLength);
+    }
+
     return {
         html: {
             type: 'String',
@@ -154,6 +166,16 @@ export async function setFieldsOnGraphQLNodeType(
         title: {
             type: 'String',
             resolve: getTitle,
+        },
+        excerptHtml: {
+            type: 'String',
+            args: {
+                pruneLength: {
+                    type: `Int`,
+                    defaultValue: 140,
+                },
+            },
+            resolve: getExcerptHtml,
         },
     };
 }
