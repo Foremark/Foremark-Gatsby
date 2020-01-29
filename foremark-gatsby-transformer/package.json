@@ -4,7 +4,7 @@
   "main": "index.js",
   "license": "MIT",
   "dependencies": {
-    "foremark": "^0.4.0",
+    "foremark": "^0.4.1",
     "gatsby-core-utils": "^1.0.7",
     "highlight.js": "^9.15.10",
     "jsdom": "^15.1.1",
