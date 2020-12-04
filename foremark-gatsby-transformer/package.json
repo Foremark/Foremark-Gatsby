@@ -6,7 +6,7 @@
   "dependencies": {
     "foremark": "=0.4.3",
     "gatsby-core-utils": "^1.0.7",
-    "highlight.js": "^9.15.10",
+    "highlight.js": "^10.4.1",
     "jsdom": "^15.1.1",
     "katex": "^0.11.0",
     "query-string": "^6.8.3"
