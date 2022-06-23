@@ -7,7 +7,7 @@
     "foremark": "=0.4.3",
     "gatsby-core-utils": "^1.0.7",
     "highlight.js": "^9.15.10",
-    "jsdom": "^15.1.1",
+    "jsdom": "^16.5.0",
     "katex": "^0.11.0",
     "query-string": "^6.8.3"
   },
